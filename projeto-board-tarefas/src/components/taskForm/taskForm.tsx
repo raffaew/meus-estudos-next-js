@@ -1,6 +1,5 @@
-// src/app/dashboard/components/TaskForm.tsx
 "use client";
-import { ChangeEvent, useState } from "react";  // remove FormEvent
+import { ChangeEvent, useState } from "react"; // remove FormEvent
 import { Textarea } from "../textarea/textarea";
 import styles from "./styles.module.css";
 import { createTask } from "@/services/saveTask";
@@ -12,10 +11,6 @@ interface TaskFormProps {
 export function TaskForm({ userEmail }: TaskFormProps) {
   const [input, setInput] = useState<string>("");
   const [publicTask, setPublicTask] = useState<boolean>(false);
-
-  function handleChangePublic(event: ChangeEvent<HTMLInputElement>) {
-    setPublicTask(event.target.checked);
-  }
 
   async function handleRegisterTask(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -37,8 +32,11 @@ export function TaskForm({ userEmail }: TaskFormProps) {
     }
   }
 
+  function handleChangePublic(event: ChangeEvent<HTMLInputElement>) {
+    setPublicTask(event.target.checked);
+  }
+
   return (
-   
     <form onSubmit={handleRegisterTask}>
       <Textarea
         placeholder="Digite qual sua tarefa..."

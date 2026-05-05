@@ -6,7 +6,10 @@ import {
   orderBy,
   where,
   onSnapshot,
+  doc,
+  deleteDoc,
 } from "firebase/firestore";
+import Link from "next/link";
 
 import { useEffect, useState } from "react";
 import styles from "./styles.module.css";
@@ -27,7 +30,7 @@ interface TaskListProps {
 }
 
 export function TaskList({ userEmail, initialTasks }: TaskListProps) {
- const [tasks, setTasks] = useState<TaskProps[]>(initialTasks);
+  const [tasks, setTasks] = useState<TaskProps[]>(initialTasks);
 
   useEffect(() => {
     const tarefasRef = collection(db, "tarefas");
@@ -38,18 +41,34 @@ export function TaskList({ userEmail, initialTasks }: TaskListProps) {
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const lista = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        tarefa: doc.data().tarefa,
-        created: doc.data().created,
-        user: doc.data().user,
-        public: doc.data().public,
-      }));
+      const lista = snapshot.docs.map((doc) => {
+        const data = doc.data();
+
+        return {
+          id: doc.id,
+          tarefa: data.tarefa,
+          created: data.created,
+          user: data.user,
+          public: data.public,
+        };
+      });
       setTasks(lista);
     });
 
     return () => unsubscribe(); // ← fecha a conexão ao desmontar o componente
   }, [userEmail]);
+
+  async function handleShare(id: string) {
+    await navigator.clipboard.writeText(
+      `${process.env.NEXT_PUBLIC_URL}/task/${id}`,
+    );
+  }
+
+  
+  async function handleDeleteTask(id: string) {
+    const docRef = doc(db, "tarefas", id);
+    await deleteDoc(docRef);
+  }
 
   return (
     <>
@@ -61,15 +80,28 @@ export function TaskList({ userEmail, initialTasks }: TaskListProps) {
             {item.public && (
               <div className={styles.tagContainer}>
                 <label className={styles.tag}>PUBLICO</label>
-                <button className={styles.shareButton}>
+                <button
+                  className={styles.shareButton}
+                  onClick={() => handleShare(item.id)}
+                >
                   <FiShare2 size={22} color="#3183ff" />
                 </button>
               </div>
             )}
 
             <div className={styles.taskContent}>
-              <p>{item.tarefa}</p>
-              <button className={styles.trashButton}>
+              {item.public ? (
+                <Link href={`/task/${item.id}`}>
+                  <p>{item.tarefa}</p>
+                </Link>
+              ) : (
+                <p>{item.tarefa}</p>
+              )}
+
+              <button
+                className={styles.trashButton}
+                onClick={() => handleDeleteTask(item.id)}
+              >
                 <FaTrash size={24} color="#ea3140" />
               </button>
             </div>
