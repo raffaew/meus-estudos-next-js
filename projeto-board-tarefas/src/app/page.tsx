@@ -1,9 +1,16 @@
 import Head from "next/head";
 import Image from "next/image";
 import style from "@/app/home.module.css";
-//import heroImg from "@/public/assets/hero.png";
 
-export default function Home() {
+import { adminDb } from "@/services/firebaseAdmin";
+
+export default async function Home() {
+  const taskSnapshot = await adminDb.collection("tarefas").count().get();
+  const commentSnapshot = await adminDb.collection("comments").count().get();
+
+  const taskCount = taskSnapshot.data().count;
+  const commentCount = commentSnapshot.data().count;
+
   return (
     <div className={style.container}>
       <Head>
@@ -15,9 +22,9 @@ export default function Home() {
           <Image
             className={style.hero}
             alt="Logo Tarefas"
-             src="/assets/hero.png" 
-             width={400}
-             height={400}
+            src="/assets/hero.png"
+            width={400}
+            height={400}
             priority
           />
         </div>
@@ -27,10 +34,10 @@ export default function Home() {
         </h1>
         <div className={style.infoContent}>
           <section className={style.box}>
-            <span>+12 posts</span>
+            <span>+ {taskCount} Posts</span>
           </section>
           <section className={style.box}>
-            <span>+90 comentários</span>
+            <span> + {commentCount} Comentários</span>
           </section>
         </div>
       </main>

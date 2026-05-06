@@ -1,12 +1,13 @@
 import { redirect } from "next/navigation";
 import styles from "./styles.module.css";
 import { adminDb } from "@/services/firebaseAdmin";
+import { CommentForm } from "@/components/commentForm/commentForm";
+
 
 interface TaskPageProps {
   params: Promise<{ id: string }>; // ← Promise no Next.js 15
 }
 
-// Tipagem da tarefa
 interface TaskData {
   tarefa: string;
   public: boolean;
@@ -14,7 +15,6 @@ interface TaskData {
   user: string;
   taskId: string;
 }
-
 
 async function getTask(id: string): Promise<TaskData | null> {
   const docRef = adminDb.collection("tarefas").doc(id);
@@ -40,8 +40,6 @@ async function getTask(id: string): Promise<TaskData | null> {
 export default async function TaskPage({ params }: TaskPageProps) {
   const { id } = await params;
   const task = await getTask(id);
-
-  // Se não encontrou ou não é público, redireciona
   if (!task) {
     redirect("/");
   }
@@ -50,10 +48,16 @@ export default async function TaskPage({ params }: TaskPageProps) {
     <div className={styles.container}>
       <main className={styles.main}>
         <h1>Tarefa</h1>
-        <p>{task.tarefa}</p>
-        <p>Criado em: {task.created}</p>
-        <p>Usuário: {task.user}</p>
+        <article className={styles.task}>
+          <p>{task.tarefa}</p>
+        </article>
+
+        <section className={styles.commentsContainer}>
+        <h2>Deixar comentário</h2>
+        <CommentForm taskId={task.taskId} />
+      </section>
       </main>
+      
     </div>
   );
 }

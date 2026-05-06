@@ -64,7 +64,6 @@ export function TaskList({ userEmail, initialTasks }: TaskListProps) {
     );
   }
 
-  
   async function handleDeleteTask(id: string) {
     const docRef = doc(db, "tarefas", id);
     await deleteDoc(docRef);
