@@ -1,8 +1,11 @@
-import Head from "next/head";
 import Image from "next/image";
 import style from "@/app/home.module.css";
 
 import { adminDb } from "@/services/firebaseAdmin";
+
+export const metadata = {
+  title: "Tarefas+ | Organize suas tarefas de forma fácil",
+}
 
 export default async function Home() {
   const taskSnapshot = await adminDb.collection("tarefas").count().get();
@@ -13,9 +16,6 @@ export default async function Home() {
 
   return (
     <div className={style.container}>
-      <Head>
-        <title>Tarefas+ | Organize suas tarefas de forma fácil</title>
-      </Head>
 
       <main className={style.main}>
         <div className={style.logoContent}>
